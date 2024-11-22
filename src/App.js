@@ -1,25 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import Annotations from './pages/Annotations';
 
-function App() {
+const PrivateRoute = ({ children }) => {
+  const { token } = useAuth();
+  return token ? children : <Navigate to="/sign-in" />;
+};
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/sign-up" element={<SignUp />} />
+          <Route path="/annotations" element={
+            <PrivateRoute>
+              <Annotations />
+            </PrivateRoute>
+          } />
+          <Route path="/" element={<Navigate to="/annotations" />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;
